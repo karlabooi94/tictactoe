@@ -10,6 +10,7 @@ class TicTacToe {
         ];
 
         this.statusDisplay = document.getElementById('status');
+        this.commentaryDisplay = document.getElementById('commentary');
         this.cells = document.querySelectorAll('.cell');
         this.restartButton = document.getElementById('restartButton');
         this.backToMenuButton = document.getElementById('backToMenu');
@@ -54,10 +55,43 @@ class TicTacToe {
         this.gameActive = true;
         this.gameState = ['', '', '', '', '', '', '', '', ''];
         this.statusDisplay.textContent = `Player ${this.currentPlayer}'s turn`;
+        this.updateCommentary('A new game begins! Let\'s see what our players have in store for us!');
         this.cells.forEach(cell => {
             cell.textContent = '';
             cell.classList.remove('x', 'o');
         });
+    }
+
+    getPositionDescription(index) {
+        const positions = [
+            'top left corner', 'top center', 'top right corner',
+            'middle left', 'center', 'middle right',
+            'bottom left corner', 'bottom center', 'bottom right corner'
+        ];
+        return positions[index];
+    }
+
+    generateCommentary(move, isComputer = false) {
+        const position = this.getPositionDescription(move);
+        const player = isComputer ? 'Computer' : `Player ${this.currentPlayer}`;
+        const excitement = Math.random() > 0.5 ? '!' : '...';
+        
+        const commentaries = [
+            `${player} has chosen the ${position}${excitement} What a strategic move${excitement}`,
+            `${player} places their mark in the ${position}${excitement} The tension is building${excitement}`,
+            `${player} takes the ${position}${excitement} This game is getting interesting${excitement}`,
+            `${player} selects the ${position}${excitement} The plot thickens${excitement}`,
+            `${player} goes for the ${position}${excitement} What will happen next${excitement}`
+        ];
+
+        return commentaries[Math.floor(Math.random() * commentaries.length)];
+    }
+
+    updateCommentary(text, isExciting = false, isVictory = false) {
+        this.commentaryDisplay.textContent = text;
+        this.commentaryDisplay.className = 'commentary';
+        if (isExciting) this.commentaryDisplay.classList.add('exciting');
+        if (isVictory) this.commentaryDisplay.classList.add('victory');
     }
 
     handleCellClick(cell) {
@@ -68,6 +102,7 @@ class TicTacToe {
         }
 
         this.updateCell(cell, cellIndex);
+        this.updateCommentary(this.generateCommentary(cellIndex), true);
         this.handleResultValidation();
 
         if (this.gameActive && this.isVsComputer && this.currentPlayer === 'O') {
@@ -78,11 +113,11 @@ class TicTacToe {
     makeComputerMove() {
         if (!this.gameActive) return;
 
-        // Simple AI: Find the best available move
         const bestMove = this.findBestMove();
         const cell = this.cells[bestMove];
         
         this.updateCell(cell, bestMove);
+        this.updateCommentary(this.generateCommentary(bestMove, true), true);
         this.handleResultValidation();
     }
 
@@ -184,6 +219,7 @@ class TicTacToe {
             this.statusDisplay.textContent = `Player ${this.currentPlayer} has won!`;
             this.gameActive = false;
             this.triggerConfetti(this.currentPlayer);
+            this.updateCommentary(`🎉 INCREDIBLE! Player ${this.currentPlayer} has emerged victorious! What a spectacular game! 🎉`, true, true);
             return;
         }
 
@@ -191,6 +227,7 @@ class TicTacToe {
         if (roundDraw) {
             this.statusDisplay.textContent = 'Game ended in a draw!';
             this.gameActive = false;
+            this.updateCommentary('A hard-fought battle ends in a draw! Both players showed incredible skill!', false, true);
             return;
         }
 
