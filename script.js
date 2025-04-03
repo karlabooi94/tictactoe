@@ -21,6 +21,17 @@ class TicTacToe {
 
         this.isVsComputer = false;
         this.initializeMenu();
+
+        // Add payment modal elements
+        this.paymentModal = document.getElementById('paymentModal');
+        this.paymentMessage = document.getElementById('paymentMessage');
+        this.customAmountInput = document.getElementById('customAmountInput');
+        this.paymentForm = document.getElementById('paymentForm');
+        this.cardForm = document.getElementById('cardForm');
+        this.amountInput = document.getElementById('amountInput');
+        this.selectedAmount = 0;
+
+        this.initializePaymentHandlers();
     }
 
     initializeMenu() {
@@ -247,6 +258,68 @@ class TicTacToe {
         }, 250);
     }
 
+    initializePaymentHandlers() {
+        // Payment amount buttons
+        document.querySelectorAll('.payment-amount').forEach(button => {
+            if (button.id !== 'customAmount') {
+                button.addEventListener('click', () => {
+                    this.selectedAmount = parseInt(button.dataset.amount);
+                    this.showPaymentForm();
+                });
+            }
+        });
+
+        // Custom amount button
+        document.getElementById('customAmount').addEventListener('click', () => {
+            this.customAmountInput.classList.remove('hidden');
+        });
+
+        // Confirm custom amount
+        document.getElementById('confirmCustomAmount').addEventListener('click', () => {
+            const amount = parseInt(this.amountInput.value);
+            if (amount > 0) {
+                this.selectedAmount = amount;
+                this.showPaymentForm();
+            }
+        });
+
+        // Close modal button
+        document.getElementById('closePaymentModal').addEventListener('click', () => {
+            this.hidePaymentModal();
+        });
+
+        // Payment form submit
+        this.cardForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.processPayment();
+        });
+    }
+
+    showPaymentModal(winner) {
+        this.paymentMessage.textContent = `Player ${winner} has won! Time to pay up!`;
+        this.paymentModal.classList.remove('hidden');
+        this.customAmountInput.classList.add('hidden');
+        this.paymentForm.classList.add('hidden');
+    }
+
+    hidePaymentModal() {
+        this.paymentModal.classList.add('hidden');
+        this.cardForm.reset();
+        this.selectedAmount = 0;
+    }
+
+    showPaymentForm() {
+        this.customAmountInput.classList.add('hidden');
+        this.paymentForm.classList.remove('hidden');
+    }
+
+    processPayment() {
+        // Here you would typically integrate with a real payment processor
+        // For demo purposes, we'll just show a success message
+        alert(`Payment of $${this.selectedAmount} processed successfully!`);
+        this.hidePaymentModal();
+    }
+
     handleResultValidation() {
         let roundWon = false;
 
@@ -271,6 +344,7 @@ class TicTacToe {
             this.gameActive = false;
             this.triggerConfetti(this.currentPlayer);
             this.updateCommentary(`🎉 INCREDIBLE! Player ${this.currentPlayer} has emerged victorious! What a spectacular game! 🎉`, true, true);
+            this.showPaymentModal(this.currentPlayer);
             return;
         }
 
