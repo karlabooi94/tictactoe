@@ -71,20 +71,71 @@ class TicTacToe {
         return positions[index];
     }
 
+    analyzeMove(move) {
+        const analysis = {
+            isCenter: move === 4,
+            isCorner: [0, 2, 6, 8].includes(move),
+            threatensWin: false,
+            blocksWin: false,
+            createsFork: false,
+            blocksFork: false
+        };
+
+        // Check if move threatens a win
+        for (let i = 0; i < this.winningConditions.length; i++) {
+            const [a, b, c] = this.winningConditions[i];
+            if ([a, b, c].includes(move)) {
+                const otherPositions = [a, b, c].filter(pos => pos !== move);
+                const playerMarks = otherPositions.filter(pos => this.gameState[pos] === this.currentPlayer);
+                if (playerMarks.length === 1) {
+                    analysis.threatensWin = true;
+                }
+            }
+        }
+
+        // Check if move blocks opponent's win
+        const opponent = this.currentPlayer === 'X' ? 'O' : 'X';
+        for (let i = 0; i < this.winningConditions.length; i++) {
+            const [a, b, c] = this.winningConditions[i];
+            if ([a, b, c].includes(move)) {
+                const otherPositions = [a, b, c].filter(pos => pos !== move);
+                const opponentMarks = otherPositions.filter(pos => this.gameState[pos] === opponent);
+                if (opponentMarks.length === 2) {
+                    analysis.blocksWin = true;
+                }
+            }
+        }
+
+        return analysis;
+    }
+
     generateCommentary(move, isComputer = false) {
         const position = this.getPositionDescription(move);
         const player = isComputer ? 'Computer' : `Player ${this.currentPlayer}`;
-        const excitement = Math.random() > 0.5 ? '!' : '...';
+        const analysis = this.analyzeMove(move);
         
-        const commentaries = [
-            `${player} has chosen the ${position}${excitement} What a strategic move${excitement}`,
-            `${player} places their mark in the ${position}${excitement} The tension is building${excitement}`,
-            `${player} takes the ${position}${excitement} This game is getting interesting${excitement}`,
-            `${player} selects the ${position}${excitement} The plot thickens${excitement}`,
-            `${player} goes for the ${position}${excitement} What will happen next${excitement}`
-        ];
+        let commentary = '';
+        
+        if (analysis.threatensWin) {
+            commentary = `${player} places their mark in the ${position}! This move threatens a win! The pressure is on!`;
+        } else if (analysis.blocksWin) {
+            commentary = `${player} blocks a potential win by taking the ${position}! What a crucial defensive move!`;
+        } else if (analysis.isCenter) {
+            commentary = `${player} takes control of the center! This is a strong strategic position that opens up multiple winning possibilities!`;
+        } else if (analysis.isCorner) {
+            commentary = `${player} secures a corner position! Corners are valuable in Tic Tac Toe as they're part of multiple winning combinations!`;
+        } else {
+            const commentaries = [
+                `${player} places their mark in the ${position}! The game is heating up!`,
+                `${player} takes the ${position}! This move adds pressure to the opponent's strategy!`,
+                `${player} selects the ${position}! The battle for control continues!`,
+                `${player} goes for the ${position}! What will the opponent do next?`,
+                `${player} marks the ${position}! The tension is building in this strategic battle!`
+            ];
+            commentary = commentaries[Math.floor(Math.random() * commentaries.length)];
+        }
 
-        return commentaries[Math.floor(Math.random() * commentaries.length)];
+        return commentary;
     }
 
     updateCommentary(text, isExciting = false, isVictory = false) {
