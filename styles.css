@@ -298,4 +298,25 @@ h1 {
     color: #e74c3c;
     margin-bottom: 1.5rem;
     font-weight: bold;
+}
+
+#card-element {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: white;
+    margin-bottom: 1rem;
+}
+
+#card-errors {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+    min-height: 1.25rem;
+}
+
+.submit-payment:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+    transform: none;
 } 

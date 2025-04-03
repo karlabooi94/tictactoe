@@ -31,6 +31,12 @@ class TicTacToe {
         this.amountInput = document.getElementById('amountInput');
         this.selectedAmount = 0;
 
+        // Initialize Stripe
+        this.stripe = Stripe('pk_live_51R9fE3KPXbZ716zh6gfZkfzQwY9NYobNdQf0OrY1iKEudna0C06j7OIazKV9CcLQrRhdipuSeZAjGM2OtCGNFE0y00tI4jhEVm');
+        this.elements = this.stripe.elements();
+        this.card = null;
+        this.initializeStripeElements();
+
         this.initializePaymentHandlers();
     }
 
@@ -258,6 +264,38 @@ class TicTacToe {
         }, 250);
     }
 
+    initializeStripeElements() {
+        // Create an instance of the card Element
+        this.card = this.elements.create('card', {
+            style: {
+                base: {
+                    fontSize: '16px',
+                    color: '#424770',
+                    '::placeholder': {
+                        color: '#aab7c4'
+                    }
+                },
+                invalid: {
+                    color: '#9e2146',
+                    iconColor: '#9e2146'
+                }
+            }
+        });
+
+        // Mount the card Element
+        this.card.mount('#card-element');
+
+        // Handle validation errors
+        this.card.on('change', (event) => {
+            const displayError = document.getElementById('card-errors');
+            if (event.error) {
+                displayError.textContent = event.error.message;
+            } else {
+                displayError.textContent = '';
+            }
+        });
+    }
+
     initializePaymentHandlers() {
         // Payment amount buttons
         document.querySelectorAll('.payment-amount').forEach(button => {
@@ -306,6 +344,8 @@ class TicTacToe {
         this.paymentModal.classList.add('hidden');
         this.cardForm.reset();
         this.selectedAmount = 0;
+        this.card.clear();
+        document.getElementById('card-errors').textContent = '';
     }
 
     showPaymentForm() {
@@ -313,11 +353,61 @@ class TicTacToe {
         this.paymentForm.classList.remove('hidden');
     }
 
-    processPayment() {
-        // Here you would typically integrate with a real payment processor
-        // For demo purposes, we'll just show a success message
-        alert(`Payment of $${this.selectedAmount} processed successfully!`);
-        this.hidePaymentModal();
+    async processPayment() {
+        const submitButton = this.cardForm.querySelector('.submit-payment');
+        submitButton.disabled = true;
+        submitButton.textContent = 'Processing...';
+
+        try {
+            // Create a payment method
+            const { paymentMethod, error } = await this.stripe.createPaymentMethod({
+                type: 'card',
+                card: this.card,
+            });
+
+            if (error) {
+                const errorElement = document.getElementById('card-errors');
+                errorElement.textContent = error.message;
+                submitButton.disabled = false;
+                submitButton.textContent = 'Pay Now';
+                return;
+            }
+
+            // Send payment to server
+            const response = await fetch('https://your-server.com/api/create-payment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    paymentMethodId: paymentMethod.id,
+                    amount: this.selectedAmount
+                })
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.error || 'Payment failed');
+            }
+
+            // Confirm the payment
+            const { error: confirmError } = await this.stripe.confirmCardPayment(result.clientSecret);
+            
+            if (confirmError) {
+                throw new Error(confirmError.message);
+            }
+
+            // Show success message
+            alert(`Payment of $${this.selectedAmount} processed successfully!`);
+            this.hidePaymentModal();
+        } catch (error) {
+            console.error('Error:', error);
+            const errorElement = document.getElementById('card-errors');
+            errorElement.textContent = error.message || 'An unexpected error occurred.';
+            submitButton.disabled = false;
+            submitButton.textContent = 'Pay Now';
+        }
     }
 
     handleResultValidation() {

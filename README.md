@@ -1,59 +1,116 @@
-# Tic Tac Toe Game
+# Karla's Tic Tac Toe Game 🎮
 
-A modern, interactive Tic Tac Toe game built with HTML, CSS, and JavaScript. Play against a friend or challenge the computer!
+A fun and interactive Tic Tac Toe game with payment integration for friendly wagers! Play against friends or the computer, with a built-in AI commentator and secure payment processing.
 
-## Features
+## Features 🌟
 
-- 🎮 Two game modes:
-  - Play against a friend
-  - Play against the computer (AI)
-- 🎨 Modern and clean UI design
-- 🎉 Celebratory confetti animation when someone wins
-- 🔄 Easy game restart and menu navigation
-- 📱 Responsive design that works on all devices
+- Clean, modern UI with smooth animations
+- Player turn management
+- Win detection with confetti celebration
+- AI commentator for added fun
+- Play against another person or computer
+- Secure payment integration with Stripe
+- Real-time payment processing
+- Comprehensive security measures
+- Automated deployment system
 
-## How to Play
+## Security Features 🔒
 
-1. Open `index.html` in your web browser
-2. Choose your game mode:
-   - "Play vs Person" to play with a friend
-   - "Play vs Computer" to play against the AI
-3. When playing against the computer:
-   - You'll play as X (first player)
-   - The computer will play as O (second player)
-   - The computer will automatically make its move after you play
-4. Use the buttons at the bottom to:
-   - "Restart Game" to start a new game
-   - "Back to Menu" to return to the main menu
+- Secure payment processing with Stripe Elements
+- Environment variable protection
+- Rate limiting
+- CORS protection
+- Helmet.js security headers
+- Input validation
+- Error logging and monitoring
+- Webhook signature verification
 
-## Computer AI Strategy
+## Getting Started 🚀
 
-The computer player uses a simple but effective strategy:
-1. First tries to win if possible
-2. Then blocks the player from winning
-3. Takes the center if available
-4. Takes corners if available
-5. Takes any available space as a last resort
+### Prerequisites
 
-## Technologies Used
+- Node.js (v14 or higher)
+- npm (v6 or higher)
+- Stripe account
+- Sentry account (for error tracking)
 
-- HTML5
-- CSS3
-- JavaScript (ES6+)
-- Canvas Confetti for animations
-
-## Setup
+### Installation
 
 1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/tic-tac-toe.git
-   ```
-2. Navigate to the project directory:
-   ```bash
-   cd tic-tac-toe
-   ```
-3. Open `index.html` in your web browser
+```bash
+git clone https://github.com/karlabooi94/tictactoe.git
+cd tictactoe
+```
 
-## License
+2. Install dependencies:
+```bash
+npm install
+```
 
-This project is open source and available under the [MIT License](LICENSE). 
+3. Set up environment variables:
+```bash
+cp .env.example .env
+# Edit .env with your actual values
+```
+
+4. Start the development server:
+```bash
+npm run dev
+```
+
+### Deployment
+
+1. Set up environment variables:
+```bash
+export STRIPE_SECRET_KEY=your_key
+export STRIPE_PUBLISHABLE_KEY=your_key
+export STRIPE_WEBHOOK_SECRET=your_secret
+```
+
+2. Run the deployment script:
+```bash
+chmod +x deploy.sh
+./deploy.sh
+```
+
+## Environment Variables 📝
+
+Required environment variables:
+- `STRIPE_SECRET_KEY`: Your Stripe secret key
+- `STRIPE_PUBLISHABLE_KEY`: Your Stripe publishable key
+- `STRIPE_WEBHOOK_SECRET`: Your Stripe webhook secret
+- `NODE_ENV`: Environment (development/production)
+- `ALLOWED_ORIGIN`: Allowed CORS origin
+- `SENTRY_DSN`: Sentry error tracking DSN
+
+## Security Best Practices 🛡️
+
+1. Never commit sensitive data to version control
+2. Use environment variables for all sensitive information
+3. Implement rate limiting to prevent abuse
+4. Validate all user inputs
+5. Use HTTPS for all requests
+6. Keep dependencies updated
+7. Monitor error logs regularly
+
+## Contributing 🤝
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## License 📄
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments 🙏
+
+- Stripe for payment processing
+- Sentry for error tracking
+- All contributors and supporters
+
+## Support 💬
+
+For support, email support@example.com or open an issue in the repository. 
